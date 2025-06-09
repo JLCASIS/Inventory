@@ -19,32 +19,76 @@
 
         <h2>ADD PRODUCTS BY CATEGORY</h2>
         <div class="categories">
-            <div class="category">
-                <img src="images/grains.webp" alt="Grains">
-                <p>Grains</p>
-            </div>
-            <div class="category">
-                <img src="images/dry fruits.jpg" alt="Dry Fruits">
-                <p>Dry Fruits</p>
-            </div>
-            <div class="category">
-                <img src="images/fruits.png" alt="Fruits">
-                <p>Fruits</p>
-            </div>
-            <div class="category">
-                <img src="images/dairyproducts.jpeg" alt="Dairy Products">
-                <p>Dairy Products</p>
-            </div>
-            <div class="category">
-                <img src="images/meats.png" alt="Meats">
-                <p>Meats</p>
-            </div>
+            <a href="grains.html" class="category-link">
+                <div class="category">
+                    <img src="images/grains.webp" alt="Grains">
+                    <p>Grains</p>
+                </div>
+            </a>
+            <a href="dryfruits.html" class="category-link">
+                <div class="category">
+                    <img src="images/dry fruits.jpg" alt="Dry Fruits">
+                    <p>Dry Fruits</p>
+                </div>
+            </a>
+            <a href="fruits.html" class="category-link">
+                <div class="category">
+                    <img src="images/fruits.png" alt="Fruits">
+                    <p>Fruits</p>
+                </div>
+            </a>
+            <a href="dairyproducts.html" class="category-link">
+                <div class="category">
+                    <img src="images/dairyproducts.jpeg" alt="Dairy Products">
+                    <p>Dairy Products</p>
+                </div>
+            </a>
+            <a href="meats.html" class="category-link">
+                <div class="category">
+                    <img src="images/meats.png" alt="Meats">
+                    <p>Meats</p>
+                </div>
+            </a>
+            
+<div class="extra-categories" style="display: none;">
+    <a href="spices.html" class="category-link">
+        <div class="category">
+            <img src="images/species.webp" alt="Spices">
+            <p>Spices</p>
+        </div>
+    </a>
+    <a href="sauces.html" class="category-link">
+        <div class="category">
+            <img src="images/sauce.jpg" alt="Sauces">
+            <p>Sauces</p>
+        </div>
+    </a>
+    <a href="greens.html" class="category-link">
+        <div class="category">
+            <img src="images/greens.webp" alt="Greens">
+            <p>Greens</p>
+        </div>
+    </a>
+    <a href="oils.html" class="category-link">
+        <div class="category">
+            <img src="images/oils.jpg" alt="Oils">
+            <p>Oils</p>
+        </div>
+    </a>
+    <a href="eggs.html" class="category-link">
+        <div class="category">
+            <img src="images/eggs.webp" alt="Eggs">
+            <p>Eggs</p>
+        </div>
+    </a>
+</div>
         </div>
 
-        <div class="view-all">
-            <span>View all</span>
-            <span class="arrow">→</span>
-        </div>
+       <div class="view-toggle" onclick="toggleCategories()">
+    <span id="toggle-text">View all</span>
+    <span class="arrow" id="toggle-arrow">→</span>
+</div>
+
 
         <div class="bottom-section">
             <div class="feature">
@@ -57,5 +101,24 @@
             </div>
         </div>
     </div>
+
+    <script>
+    function toggleCategories() {
+        const extra = document.querySelector('.extra-categories');
+        const text = document.getElementById('toggle-text');
+        const arrow = document.getElementById('toggle-arrow');
+
+        if (extra.style.display === 'none') {
+            extra.style.display = 'flex';
+            text.textContent = 'Less view';
+            arrow.textContent = '←';
+        } else {
+            extra.style.display = 'none';
+            text.textContent = 'View all';
+            arrow.textContent = '→';
+        }
+    }
+</script>
+
 </body>
 </html>

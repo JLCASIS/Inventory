@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Grains Category</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="container minimalist-container">
+        <header>
+            <h1>Grains</h1>
+            <a href="index.html" class="back-link">← Back to Dashboard</a>
+        </header>
+
+        <main class="products-grid">
+            <div class="product-card">
+                <img src="images/products/Grains/wheat.jpg" alt="Wheat" />
+                <div class="product-info">
+                    <p class="product-name">Wheat</p>
+                    <p class="product-price">$4.99 / kg</p>
+                    <div class="quantity-controls">
+                        <button class="qty-btn" onclick="decreaseQty(this)">−</button>
+                        <input type="number" value="1" min="1" class="qty-input" readonly />
+                        <button class="qty-btn" onclick="increaseQty(this)">+</button>
+                    </div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="images/products/Grains/otas.avif" alt="Oats" />
+                <div class="product-info">
+                    <p class="product-name">Oats</p>
+                    <p class="product-price">$3.49 / kg</p>
+                    <div class="quantity-controls">
+                        <button class="qty-btn" onclick="decreaseQty(this)">−</button>
+                        <input type="number" value="1" min="1" class="qty-input" readonly />
+                        <button class="qty-btn" onclick="increaseQty(this)">+</button>
+                    </div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function increaseQty(button) {
+            const input = button.parentElement.querySelector('.qty-input');
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseQty(button) {
+            const input = button.parentElement.querySelector('.qty-input');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+    </script>
+</body>
+</html>
