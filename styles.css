@@ -204,5 +204,192 @@ body {
     color: #ccc;
 }
 
+/* Popup Styles */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
 
+.popup-container {
+    background-color: #111;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.close-btn {
+    font-size: 24px;
+    cursor: pointer;
+    color: #ccc;
+}
+
+.close-btn:hover {
+    color: white;
+}
+
+.form-steps {
+    position: relative;
+    min-height: 400px;
+}
+
+.form-step {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-step.active {
+    display: flex;
+}
+
+.category-options {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns */
+    gap: 15px;
+    justify-items: center; /* center items horizontally */
+}
+
+.category-option {
+    width: 100%; /* take full width of grid cell */
+    max-width: 100px; /* limit maximum width */
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+
+
+.category-option:hover {
+    transform: scale(1.05);
+}
+
+.category-option img {
+    width: 100%; /* make image fill the container */
+    height: 100px; /* fixed height */
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid transparent;
+}
+
+.category-option.selected img {
+    border-color: #00c853;
+}
+
+.category-option p {
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+.image-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.image-preview {
+    width: 200px;
+    height: 200px;
+    border: 2px dashed #444;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#previewImage {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#uploadText {
+    color: #777;
+    text-align: center;
+    padding: 20px;
+}
+
+.upload-btn {
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.upload-btn:hover {
+    background-color: #444;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    text-align: left;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.form-group input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: #222;
+    color: white;
+}
+
+.step-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.next-btn, .back-btn, .submit-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.next-btn, .submit-btn {
+    background-color: #00c853;
+    color: white;
+}
+
+.next-btn:hover, .submit-btn:hover {
+    background-color: #00e676;
+}
+
+.back-btn {
+    background-color: #333;
+    color: white;
+}
+
+.back-btn:hover {
+    background-color: #444;
+}
 

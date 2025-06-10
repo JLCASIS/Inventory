@@ -1,16 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Inventory Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Add Firebase and Cloudinary SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 </head>
+
 <body>
+    <!-- Popup Container -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-container">
+            <div class="popup-header">
+                <h3>Add New Product</h3>
+                <span class="close-btn" id="closePopup">&times;</span>
+            </div>
+
+            <div class="form-steps">
+                <!-- Step 1: Select Category -->
+                <div class="form-step active" id="step1">
+                    <h4>Select Category</h4>
+                    <div class="category-options">
+                        <div class="category-option" data-category="grains">
+                            <img src="images/grains.webp" alt="Grains">
+                            <p>Grains</p>
+                        </div>
+                        <div class="category-option" data-category="dryfruits">
+                            <img src="images/dry fruits.jpg" alt="Dry Fruits">
+                            <p>Dry Fruits</p>
+                        </div>
+                        <div class="category-option" data-category="fruits">
+                            <img src="images/fruits.png" alt="Fruits">
+                            <p>Fruits</p>
+                        </div>
+                        <div class="category-option" data-category="dairy">
+                            <img src="images/dairyproducts.jpeg" alt="Dairy Products">
+                            <p>Dairy Products</p>
+                        </div>
+                        <div class="category-option" data-category="meats">
+                            <img src="images/meats.png" alt="Meats">
+                            <p>Meats</p>
+                        </div>
+                        <div class="category-option" data-category="spices">
+                            <img src="images/species.webp" alt="Spices">
+                            <p>Meats</p>
+                        </div>
+                        <div class="category-option" data-category="sauces">
+                            <img src="images/sauce.jpg" alt="Sauces">
+                            <p>Meats</p>
+                        </div>
+                        <div class="category-option" data-category="greens">
+                            <img src="images/greens.webp" alt="Greens">
+                            <p>Meats</p>
+                        </div>
+                        <div class="category-option" data-category="oils">
+                            <img src="images/oils.jpg" alt="Oils">
+                            <p>Meats</p>
+                        </div>
+                        <div class="category-option" data-category="eggs">
+                            <img src="images/eggs.webp" alt="Eggs">
+                            <p>Meats</p>
+                        </div>
+                    </div>
+                    <button class="next-btn" id="step1Next">Next</button>
+                </div>
+
+                <!-- Step 2: Upload Image -->
+                <div class="form-step" id="step2">
+                    <h4>Upload Product Image</h4>
+                    <div class="image-upload-container">
+                        <div class="image-preview" id="imagePreview">
+                            <img id="previewImage" style="display: none;">
+                            <p id="uploadText">No image selected</p>
+                        </div>
+                        <button class="upload-btn" id="uploadBtn">Select Image</button>
+                    </div>
+                    <div class="step-buttons">
+                        <button class="back-btn" id="step2Back">Back</button>
+                        <button class="next-btn" id="step2Next">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Product Details -->
+                <div class="form-step" id="step3">
+                    <h4>Product Information</h4>
+                    <div class="form-group">
+                        <label for="productName">Product Name</label>
+                        <input type="text" id="productName" placeholder="Enter product name">
+                    </div>
+                    <div class="form-group">
+                        <label for="productQuantity">Quantity</label>
+                        <input type="number" id="productQuantity" placeholder="Enter quantity">
+                    </div>
+                    <div class="form-group">
+                        <label for="storageDate">Date of Storing</label>
+                        <input type="date" id="storageDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="expiryDate">Expiry Date</label>
+                        <input type="date" id="expiryDate">
+                    </div>
+                    <div class="step-buttons">
+                        <button class="back-btn" id="step3Back">Back</button>
+                        <button class="submit-btn" id="submitProduct">Add Product</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <div class="top-bar">
             <input type="text" placeholder="Search" class="search-bar">
             <div class="icons">
-              <span class="icon notification">🔔</span>  <!-- Bell icon -->
+                <span class="icon notification">🔔</span> <!-- Bell icon -->
             </div>
         </div>
 
@@ -48,7 +155,7 @@
                     <p>Meats</p>
                 </div>
             </a>
-            
+
             <div class="extra-categories" style="display: none;">
                 <a href="spices.html" class="category-link">
                     <div class="category" id="spices-category">
@@ -101,21 +208,24 @@
     </div>
 
     <script>
-    function toggleCategories() {
-        const extra = document.querySelector('.extra-categories');
-        const text = document.getElementById('toggle-text');
-        const arrow = document.getElementById('toggle-arrow');
+        function toggleCategories() {
+            const extra = document.querySelector('.extra-categories');
+            const text = document.getElementById('toggle-text');
+            const arrow = document.getElementById('toggle-arrow');
 
-        if (extra.style.display === 'none') {
-            extra.style.display = 'flex';
-            text.textContent = 'Less view';
-            arrow.textContent = '←';
-        } else {
-            extra.style.display = 'none';
-            text.textContent = 'View all';
-            arrow.textContent = '→';
+            if (extra.style.display === 'none') {
+                extra.style.display = 'flex';
+                text.textContent = 'Less view';
+                arrow.textContent = '←';
+            } else {
+                extra.style.display = 'none';
+                text.textContent = 'View all';
+                arrow.textContent = '→';
+            }
         }
-    }
     </script>
+
+    <script type="module" src="app.js"></script>
 </body>
+
 </html>
