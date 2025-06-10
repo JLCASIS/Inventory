@@ -1,23 +1,33 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Grains Category</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="categories.css" />
 </head>
 <body>
+    <!-- Real-time clock -->
+    <div class="clock-container">
+        <span id="current-time">Loading...</span>
+    </div>
+
     <div class="container minimalist-container">
         <header>
             <h1>Grains</h1>
             <a href="index.html" class="back-link">← Back to Dashboard</a>
         </header>
 
-        <main class="products-grid">
-            <div class="product-card">
-                <img src="images/products/Grains/otas.avif" alt="Oats" />
-                <div class="product-info">
-                    <p class="product-name">Oats</p>
-                    <p class="product-quantity">Product Quantity:5</p>
-                    <p class="product-storedate">Product Store Date:5/12/2025</p>
+        <main class="products-grid">    
+            <!-- Products will be dynamically loaded here -->
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading grains products...</p>
+            </div>
+        </main>
     </div>
+
+    <script type="module" src="categories.js"></script>
+</body>
 </html>

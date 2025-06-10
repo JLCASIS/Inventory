@@ -49,6 +49,32 @@ let formState = {
     expiryDate: ''
 };
 
+// Helper function to calculate days until expiry
+function calculateDaysUntilExpiry(storageDate, expiryDate) {
+    const storage = new Date(storageDate);
+    const expiry = new Date(expiryDate);
+    const today = new Date();
+    
+    // Reset time to start of day for accurate comparison
+    today.setHours(0, 0, 0, 0);
+    expiry.setHours(0, 0, 0, 0);
+    
+    const timeDiff = expiry.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    
+    return daysDiff;
+}
+
+// Helper function to check if product is expired or expiring
+function isProductExpiredOrExpiring(storageDate, expiryDate) {
+    const daysUntilExpiry = calculateDaysUntilExpiry(storageDate, expiryDate);
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    
+    // Check if already expired or days left is 0 or less
+    return expiry < today || daysUntilExpiry <= 0;
+}
+
 // Event Listeners
 addButton.addEventListener('click', () => {
     popupOverlay.style.display = 'flex';
@@ -112,6 +138,12 @@ submitProduct.addEventListener('click', async () => {
         return;
     }
     
+    // Check if storage date is after expiry date
+    if (new Date(formState.storageDate) > new Date(formState.expiryDate)) {
+        alert('Storage date cannot be after expiry date');
+        return;
+    }
+    
     try {
         // Show loading state
         submitProduct.disabled = true;
@@ -125,7 +157,11 @@ submitProduct.addEventListener('click', async () => {
         // Create a sanitized category ID (replace spaces and special characters)
         const categoryId = formState.category.toLowerCase().replace(/[^a-z0-9]/g, '_');
         
-        // Save to Firestore with category-based subcollection
+        // Check if product is expired or expiring
+        const isExpired = isProductExpiredOrExpiring(formState.storageDate, formState.expiryDate);
+        const daysUntilExpiry = calculateDaysUntilExpiry(formState.storageDate, formState.expiryDate);
+        
+        // Create product data
         const productData = {
             name: formState.productName,
             quantity: parseInt(formState.quantity),
@@ -133,30 +169,54 @@ submitProduct.addEventListener('click', async () => {
             expiryDate: formState.expiryDate,
             imageUrl: formState.imageUrl,
             imagePublicId: formState.imagePublicId,
+            category: formState.category,
+            categoryId: categoryId,
+            daysUntilExpiry: daysUntilExpiry,
+            isExpired: isExpired,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
         
-        // Add to both the main products collection and the category subcollection
         const batch = db.batch();
         
-        // Add to main products collection
-        const productRef = db.collection('products').doc();
-        batch.set(productRef, {
-            ...productData,
-            category: formState.category,
-            categoryId: categoryId
-        });
-        
-        // Add to category subcollection
-        const categoryProductRef = db.collection('categories').doc(categoryId)
-            .collection('products').doc(productRef.id);
-        batch.set(categoryProductRef, productData);
+        if (isExpired) {
+            // Product is expired or expiring - store in expiry collection
+            const expiryRef = db.collection('expiry').doc();
+            batch.set(expiryRef, {
+                ...productData,
+                expiredAt: firebase.firestore.FieldValue.serverTimestamp(),
+                reason: daysUntilExpiry < 0 ? 'Already expired' : 'Expires today or tomorrow'
+            });
+            
+            // Also add to main products collection but mark as expired
+            const productRef = db.collection('products').doc();
+            batch.set(productRef, {
+                ...productData,
+                status: 'expired',
+                expiredAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            alert(`Product is expired or expiring (${daysUntilExpiry} days left). It has been moved to the expiry collection.`);
+        } else {
+            // Product is not expired - store normally
+            // Add to main products collection
+            const productRef = db.collection('products').doc();
+            batch.set(productRef, {
+                ...productData,
+                status: 'active'
+            });
+            
+            // Add to category subcollection
+            const categoryProductRef = db.collection('categories').doc(categoryId)
+                .collection('products').doc(productRef.id);
+            batch.set(categoryProductRef, productData);
+            
+            alert(`Product added successfully! Days until expiry: ${daysUntilExpiry}`);
+        }
         
         // Commit the batch write
         await batch.commit();
         
-        alert('Product added successfully!');
         popupOverlay.style.display = 'none';
     } catch (error) {
         console.error('Error adding product:', error);
@@ -209,4 +269,56 @@ function resetForm() {
     previewImage.src = '';
     previewImage.style.display = 'none';
     uploadText.style.display = 'block';
+}
+
+// Optional: Function to move existing expired products to expiry collection
+async function moveExpiredProductsToExpiry() {
+    try {
+        const productsSnapshot = await db.collection('products').where('status', '==', 'active').get();
+        const batch = db.batch();
+        let movedCount = 0;
+        
+        productsSnapshot.forEach(doc => {
+            const product = doc.data();
+            const isExpired = isProductExpiredOrExpiring(product.storageDate, product.expiryDate);
+            
+            if (isExpired) {
+                // Add to expiry collection
+                const expiryRef = db.collection('expiry').doc();
+                batch.set(expiryRef, {
+                    ...product,
+                    originalProductId: doc.id,
+                    movedToExpiryAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    reason: 'Moved from active products - expired'
+                });
+                
+                // Update original product status
+                batch.update(doc.ref, {
+                    status: 'expired',
+                    expiredAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Remove from category subcollection
+                if (product.categoryId) {
+                    const categoryProductRef = db.collection('categories')
+                        .doc(product.categoryId)
+                        .collection('products')
+                        .doc(doc.id);
+                    batch.delete(categoryProductRef);
+                }
+                
+                movedCount++;
+            }
+        });
+        
+        if (movedCount > 0) {
+            await batch.commit();
+            console.log(`Moved ${movedCount} expired products to expiry collection`);
+        }
+        
+        return movedCount;
+    } catch (error) {
+        console.error('Error moving expired products:', error);
+        throw error;
+    }
 }
