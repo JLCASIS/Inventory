@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking</title>
+    <link rel="stylesheet" href="tracking.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <div class="header-content">
+                <span class="tracking-logo">
+                    <i class="fas fa-seedling" title="Grains"></i>
+                    <i class="fas fa-apple-alt" title="Fruits"></i>
+                    <i class="fas fa-cheese" title="Dairy"></i>
+                    <i class="fas fa-carrot" title="Vegetables"></i>
+                </span>
+                <h1>Tracking</h1>
+                <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            </div>
+        </header>
+
+        <div class="products-container">
+            <!-- Example product items -->
+            <div class="product-item">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=80&q=80" alt="Apple">
+                </div>
+                <div class="product-info">
+                    <div class="product-name">Apple</div>
+                    <div class="product-details">
+                        <div class="product-detail"><i class="fas fa-tag"></i> Category: Fruit</div>
+                        <div class="product-detail quantity-control">
+                            <i class="fas fa-box"></i> 
+                            Quantity: 
+                            <button class="decrease-btn" onclick="changeQuantity(this, -1)"><i class="fas fa-minus"></i></button>
+                            <span class="quantity-value">50</span>
+                            <button class="increase-btn" onclick="changeQuantity(this, 1)"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="product-detail status in-stock"><i class="fas fa-check-circle"></i> In Stock</div>
+                        <button class="delete-btn" onclick="deleteProduct(this)" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="product-item">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1587731596645-d945662ad7b5?auto=format&fit=crop&w=80&q=80" alt="Rice">
+                </div>
+                <div class="product-info">
+                    <div class="product-name">Rice</div>
+                    <div class="product-details">
+                        <div class="product-detail"><i class="fas fa-tag"></i> Category: Grain</div>
+                        <div class="product-detail quantity-control">
+                            <i class="fas fa-box"></i> 
+                            Quantity: 
+                            <button class="decrease-btn" onclick="changeQuantity(this, -1)"><i class="fas fa-minus"></i></button>
+                            <span class="quantity-value">200</span>
+                            <button class="increase-btn" onclick="changeQuantity(this, 1)"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="product-detail status in-stock"><i class="fas fa-check-circle"></i> In Stock</div>
+                        <button class="delete-btn" onclick="deleteProduct(this)" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="product-item">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80" alt="Milk">
+                </div>
+                <div class="product-info">
+                    <div class="product-name">Milk</div>
+                    <div class="product-details">
+                        <div class="product-detail"><i class="fas fa-tag"></i> Category: Dairy</div>
+                        <div class="product-detail quantity-control">
+                            <i class="fas fa-box"></i> 
+                            Quantity: 
+                            <button class="decrease-btn" onclick="changeQuantity(this, -1)"><i class="fas fa-minus"></i></button>
+                            <span class="quantity-value">10</span>
+                            <button class="increase-btn" onclick="changeQuantity(this, 1)"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="product-detail status low-stock"><i class="fas fa-exclamation-circle"></i> Low Stock</div>
+                        <button class="delete-btn" onclick="deleteProduct(this)" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="product-item">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=80&q=80" alt="Orange">
+                </div>
+                <div class="product-info">
+                    <div class="product-name">Orange</div>
+                    <div class="product-details">
+                        <div class="product-detail"><i class="fas fa-tag"></i> Category: Fruit</div>
+                        <div class="product-detail quantity-control">
+                            <i class="fas fa-box"></i> 
+                            Quantity: 
+                            <button class="decrease-btn" onclick="changeQuantity(this, -1)"><i class="fas fa-minus"></i></button>
+                            <span class="quantity-value">0</span>
+                            <button class="increase-btn" onclick="changeQuantity(this, 1)"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="product-detail status out-stock"><i class="fas fa-times-circle"></i> Out of Stock</div>
+                        <button class="delete-btn" onclick="deleteProduct(this)" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function changeQuantity(btn, diff) {
+            const qtySpan = btn.parentElement.querySelector('.quantity-value');
+            let qty = parseInt(qtySpan.textContent, 10);
+            qty += diff;
+            if (qty < 0) qty = 0;
+            qtySpan.textContent = qty;
+
+            // Update status based on new quantity
+            const statusDiv = btn.parentElement.parentElement.querySelector('.status');
+            if (qty === 0) {
+                statusDiv.className = 'product-detail status out-stock';
+                statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> Out of Stock';
+            } else if (qty <= 10) {
+                statusDiv.className = 'product-detail status low-stock';
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Low Stock';
+            } else {
+                statusDiv.className = 'product-detail status in-stock';
+                statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> In Stock';
+            }
+        }
+
+        function deleteProduct(btn) {
+            const productItem = btn.closest('.product-item');
+            productItem.remove();
+        }
+    </script>
+</body>
+</html>

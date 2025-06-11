@@ -52,7 +52,7 @@ body {
 
 .loading-spinner i {
     font-size: 3rem;
-    color: #ff6b35;
+    color: #00c853;
     margin-bottom: 20px;
 }
 
@@ -146,13 +146,13 @@ body {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #ff6b35, #ff8e53);
+    background: #00c853;
 }
 
 .product-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.2);
-    border-color: #ff6b35;
+    box-shadow: #00c853;
+    border-color: #00c853;
 }
 
 /* Product Image */
@@ -167,7 +167,7 @@ body {
 
 .product-image:hover {
     transform: scale(1.05);
-    border-color: #ff6b35;
+    border-color: #00c853;
 }
 
 .image-placeholder {
@@ -215,7 +215,7 @@ body {
 }
 
 .expired-date {
-    color: #ff6b35;
+    color: #00c853;
     font-weight: 600;
 }
 
@@ -242,7 +242,7 @@ body {
 .delete-btn {
     background: linear-gradient(135deg, #555, #444);
     border: none;
-    color: #ff6b35;
+    color: #00c853;
     width: 45px;
     height: 45px;
     border-radius: 50%;
@@ -378,12 +378,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #ff6b35;
+    background: #00c853;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #ff8e53;
+    background: #00c853;
 }
 
 .back-link {
