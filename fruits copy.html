@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grains Category</title>
+    <link rel="stylesheet" href="categories.css" />
+</head>
+<body>
+    <!-- Real-time clock -->
+    <div class="clock-container">
+        <span id="current-time">Loading...</span>
+    </div>
+
+    <div class="container minimalist-container">
+        <header>
+            <h1>Fruits</h1>
+            <a href="index.html" class="back-link">← Back to Dashboard</a>
+        </header>
+
+        <main class="products-grid">    
+            <!-- Products will be dynamically loaded here -->
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading fruits products...</p>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="JAVASCRIPT/fruits.js"></script>
+</body>
+</html>
