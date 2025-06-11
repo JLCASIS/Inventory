@@ -1,4 +1,4 @@
-// Initialize Firebase with your config
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAK1k03ZF97KyeKuIRcALaGLYk5ZQgYm1o",
     authDomain: "inventory-system-51c3c.firebaseapp.com",
@@ -12,241 +12,306 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth();
 
 // DOM Elements
-const loadingContainer = document.getElementById('loadingContainer');
-const expiredContainer = document.getElementById('expiredContainer');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const errorMessage = document.getElementById('errorMessage');
+const productsContainer = document.getElementById('productsContainer');
 const emptyState = document.getElementById('emptyState');
-const totalExpiredEl = document.getElementById('totalExpired');
-const expiredTodayEl = document.getElementById('expiredToday');
-const totalValueEl = document.getElementById('totalValue');
 
-// Calculate days since expiry
-function calculateDaysSinceExpiry(expiryDate) {
-    const expiry = new Date(expiryDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    expiry.setHours(0, 0, 0, 0);
-    
-    const timeDiff = today.getTime() - expiry.getTime();
-    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    
-    return daysDiff;
-}
+// Load expired products when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadExpiredProducts();
+});
 
-// Format days expired text
-function formatDaysExpired(days) {
-    if (days === 0) {
-        return 'Expires Today';
-    } else if (days === 1) {
-        return '1 Day Expired';
-    } else if (days > 1) {
-        return `${days} Days Expired`;
-    } else {
-        return 'Expires Soon';
-    }
-}
-
-// Create expired product HTML
-function createExpiredProductHTML(product, id) {
-    const daysExpired = calculateDaysSinceExpiry(product.expiryDate);
-    const imageUrl = product.imageUrl || 'https://via.placeholder.com/80x80?text=No+Image';
-    
-    return `
-        <div class="expired-item" data-id="${id}">
-            <img src="${imageUrl}" alt="${product.name}" class="product-image" 
-                 onerror="this.src='https://via.placeholder.com/80x80?text=No+Image'">
-            
-            <div class="product-info">
-                <div class="product-name">${product.name}</div>
-                <div class="product-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Category:</span>
-                        <span class="category-badge">${product.category || 'Unknown'}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Quantity:</span>
-                        <span>${product.quantity || 0}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Storage Date:</span>
-                        <span>${new Date(product.storageDate).toLocaleDateString()}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Expiry Date:</span>
-                        <span>${new Date(product.expiryDate).toLocaleDateString()}</span>
-                    </div>
-                    ${product.reason ? `
-                    <div class="detail-item">
-                        <span class="detail-label">Reason:</span>
-                        <span>${product.reason}</span>
-                    </div>
-                    ` : ''}
-                </div>
-            </div>
-            
-            <div class="expiry-info">
-                <div class="days-expired">${formatDaysExpired(daysExpired)}</div>
-                <button class="delete-btn" onclick="deleteExpiredProduct('${id}')">
-                    🗑️ Remove
-                </button>
-            </div>
-        </div>
-    `;
-}
-
-// Delete expired product
-async function deleteExpiredProduct(productId) {
-    if (!confirm('Are you sure you want to permanently delete this expired product?')) {
-        return;
-    }
-
-    try {
-        await db.collection('expiry').doc(productId).delete();
-        
-        // Remove from DOM
-        const productElement = document.querySelector(`[data-id="${productId}"]`);
-        if (productElement) {
-            productElement.style.transform = 'translateX(-100%)';
-            productElement.style.opacity = '0';
-            setTimeout(() => {
-                productElement.remove();
-                updateStats();
-                
-                // Check if no products left
-                if (expiredContainer.children.length === 0) {
-                    showEmptyState();
-                }
-            }, 300);
-        }
-        
-        console.log('Expired product deleted successfully');
-    } catch (error) {
-        console.error('Error deleting expired product:', error);
-        alert('Error deleting product. Please try again.');
-    }
-}
-
-// Update statistics
-function updateStats() {
-    const expiredItems = document.querySelectorAll('.expired-item');
-    const today = new Date().toDateString();
-    
-    let expiredToday = 0;
-    let estimatedLoss = 0;
-    
-    expiredItems.forEach(item => {
-        const productData = item.dataset;
-        // Simple estimation - $5 per item (you can make this more sophisticated)
-        estimatedLoss += 5;
-        
-        // Check if expired today (this is a simplified check)
-        expiredToday += Math.random() < 0.3 ? 1 : 0; // Random for demo
-    });
-    
-    totalExpiredEl.textContent = expiredItems.length;
-    expiredTodayEl.textContent = Math.floor(expiredItems.length * 0.3); // Estimated
-    totalValueEl.textContent = `$${estimatedLoss}`;
-}
-
-// Show empty state
-function showEmptyState() {
-    loadingContainer.style.display = 'none';
-    expiredContainer.style.display = 'none';
-    emptyState.style.display = 'block';
-    
-    // Update stats to zero
-    totalExpiredEl.textContent = '0';
-    expiredTodayEl.textContent = '0';
-    totalValueEl.textContent = '$0';
-}
-
-// Load expired products from Firestore
+// Function to load expired products from Firestore
 async function loadExpiredProducts() {
     try {
-        // Ensure user is authenticated
-        if (!auth.currentUser) {
-            await auth.signInAnonymously();
-        }
-
-        const expiredSnapshot = await db.collection('expiry')
-            .orderBy('createdAt', 'desc')
+        showLoading();
+        
+        // Get today's date in YYYY-MM-DD format for comparison
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        
+        // Query the expiry collection for expired products
+        const snapshot = await db.collection('expiry')
+            .where('expiryDate', '<=', todayStr)
+            .orderBy('expiryDate', 'desc')
             .get();
-
-        if (expiredSnapshot.empty) {
+        
+        hideLoading();
+        
+        if (snapshot.empty) {
             showEmptyState();
             return;
         }
-
-        let expiredHTML = '';
-        expiredSnapshot.forEach(doc => {
-            const product = doc.data();
-            expiredHTML += createExpiredProductHTML(product, doc.id);
-        });
-
-        expiredContainer.innerHTML = expiredHTML;
-        loadingContainer.style.display = 'none';
-        expiredContainer.style.display = 'grid';
         
-        // Update statistics
-        updateStats();
-
+        const products = [];
+        snapshot.forEach(doc => {
+            products.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        displayProducts(products);
+        
     } catch (error) {
         console.error('Error loading expired products:', error);
-        loadingContainer.innerHTML = `
-            <div style="color: #ff6b6b; text-align: center;">
-                <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
-                <div>Error loading expired products</div>
-                <div style="font-size: 0.9rem; opacity: 0.7; margin-top: 5px;">
-                    ${error.message}
-                </div>
-                <button onclick="loadExpiredProducts()" 
-                        style="margin-top: 15px; padding: 10px 20px; background: #ff6b35; 
-                               color: white; border: none; border-radius: 8px; cursor: pointer;">
-                    Retry
-                </button>
-            </div>
-        `;
+        hideLoading();
+        showError();
     }
 }
 
-// Real-time updates (optional)
-function setupRealtimeUpdates() {
-    db.collection('expiry').onSnapshot((snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-            if (change.type === 'added') {
-                // Handle new expired product
-                const product = change.doc.data();
-                const productHTML = createExpiredProductHTML(product, change.doc.id);
-                expiredContainer.insertAdjacentHTML('afterbegin', productHTML);
-                updateStats();
-            } else if (change.type === 'removed') {
-                // Handle deleted product
-                const productElement = document.querySelector(`[data-id="${change.doc.id}"]`);
-                if (productElement) {
-                    productElement.remove();
-                    updateStats();
-                }
-            }
-        });
-        
-        // Show empty state if no products
-        if (expiredContainer.children.length === 0) {
-            showEmptyState();
-        } else {
-            emptyState.style.display = 'none';
-            expiredContainer.style.display = 'grid';
-        }
+// Function to display products
+function displayProducts(products) {
+    productsContainer.innerHTML = '';
+    
+    products.forEach(product => {
+        const productElement = createProductElement(product);
+        productsContainer.appendChild(productElement);
+    });
+    
+    // Add staggered animation
+    const productItems = document.querySelectorAll('.product-item');
+    productItems.forEach((item, index) => {
+        item.style.animationDelay = `${index * 0.1}s`;
     });
 }
 
-// Initialize the page
-document.addEventListener('DOMContentLoaded', () => {
-    loadExpiredProducts();
+// Function to create product element
+function createProductElement(product) {
+    const productDiv = document.createElement('div');
+    productDiv.className = 'product-item';
+    productDiv.setAttribute('data-id', product.id);
     
-    // Enable real-time updates after initial load
-    setTimeout(() => {
-        setupRealtimeUpdates();
-    }, 2000);
+    // Calculate days expired
+    const today = new Date();
+    const expiryDate = new Date(product.expiryDate);
+    const daysExpired = Math.floor((today - expiryDate) / (1000 * 60 * 60 * 24));
+    
+    // Create image element
+    const imageElement = createImageElement(product);
+    
+    // Create product info
+    const productInfo = document.createElement('div');
+    productInfo.className = 'product-info';
+    
+    const productName = document.createElement('div');
+    productName.className = 'product-name';
+    productName.textContent = product.name || product.productName || 'Unknown Product';
+    
+    const productDetails = document.createElement('div');
+    productDetails.className = 'product-details';
+    
+    // Add product details
+    if (product.category) {
+        const categoryDetail = createDetailElement('fas fa-tag', 'Category', product.category);
+        productDetails.appendChild(categoryDetail);
+    }
+    
+    if (product.quantity) {
+        const quantityDetail = createDetailElement('fas fa-boxes', 'Quantity', product.quantity);
+        productDetails.appendChild(quantityDetail);
+    }
+    
+    const expiryDetail = createDetailElement('fas fa-calendar-times', 'Expired', formatDate(expiryDate));
+    expiryDetail.querySelector('.expired-date').classList.add('expired-date');
+    productDetails.appendChild(expiryDetail);
+    
+    productInfo.appendChild(productName);
+    productInfo.appendChild(productDetails);
+    
+    // Create actions
+    const productActions = document.createElement('div');
+    productActions.className = 'product-actions';
+    
+    const daysExpiredElement = document.createElement('div');
+    daysExpiredElement.className = 'days-expired';
+    daysExpiredElement.textContent = `${daysExpired}d`;
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+    deleteBtn.title = 'Delete expired product';
+    deleteBtn.onclick = () => deleteProduct(product.id, productDiv);
+    
+    productActions.appendChild(daysExpiredElement);
+    productActions.appendChild(deleteBtn);
+    
+    // Assemble product element
+    productDiv.appendChild(imageElement);
+    productDiv.appendChild(productInfo);
+    productDiv.appendChild(productActions);
+    
+    return productDiv;
+}
+
+// Function to create image element
+function createImageElement(product) {
+    if (product.imageUrl || product.cloudinaryUrl) {
+        const img = document.createElement('img');
+        img.className = 'product-image';
+        img.src = product.imageUrl || product.cloudinaryUrl;
+        img.alt = product.name || 'Product image';
+        img.onerror = function() {
+            this.style.display = 'none';
+            const placeholder = createImagePlaceholder();
+            this.parentNode.insertBefore(placeholder, this);
+        };
+        return img;
+    } else {
+        return createImagePlaceholder();
+    }
+}
+
+// Function to create image placeholder
+function createImagePlaceholder() {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'image-placeholder';
+    placeholder.innerHTML = '<i class="fas fa-image"></i>';
+    return placeholder;
+}
+
+// Function to create detail element
+function createDetailElement(iconClass, label, value) {
+    const detail = document.createElement('div');
+    detail.className = 'product-detail';
+    
+    const icon = document.createElement('i');
+    icon.className = iconClass;
+    
+    const text = document.createElement('span');
+    text.className = label.toLowerCase() === 'expired' ? 'expired-date' : '';
+    text.textContent = `${label}: ${value}`;
+    
+    detail.appendChild(icon);
+    detail.appendChild(text);
+    
+    return detail;
+}
+
+// Function to format date
+function formatDate(date) {
+    const dateObj = date instanceof Date ? date : new Date(date);
+    return dateObj.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+// Function to delete product
+async function deleteProduct(productId, productElement) {
+    if (!confirm('Are you sure you want to delete this expired product?')) {
+        return;
+    }
+    
+    try {
+        // Add loading state to delete button
+        const deleteBtn = productElement.querySelector('.delete-btn');
+        const originalContent = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        deleteBtn.disabled = true;
+        
+        // Delete from Firestore
+        await db.collection('expiry').doc(productId).delete();
+        
+        // Remove from DOM with animation
+        productElement.style.transform = 'translateX(-100%)';
+        productElement.style.opacity = '0';
+        
+        setTimeout(() => {
+            productElement.remove();
+            
+            // Check if no products left
+            if (productsContainer.children.length === 0) {
+                showEmptyState();
+            }
+        }, 300);
+        
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        
+        // Restore delete button
+        const deleteBtn = productElement.querySelector('.delete-btn');
+        deleteBtn.innerHTML = originalContent;
+        deleteBtn.disabled = false;
+        
+        alert('Failed to delete product. Please try again.');
+    }
+}
+
+// UI State Management Functions
+function showLoading() {
+    loadingSpinner.style.display = 'block';
+    errorMessage.style.display = 'none';
+    productsContainer.style.display = 'none';
+    emptyState.style.display = 'none';
+}
+
+function hideLoading() {
+    loadingSpinner.style.display = 'none';
+}
+
+function showError() {
+    errorMessage.style.display = 'block';
+    productsContainer.style.display = 'none';
+    emptyState.style.display = 'none';
+}
+
+function showEmptyState() {
+    emptyState.style.display = 'block';
+    productsContainer.style.display = 'none';
+    errorMessage.style.display = 'none';
+}
+
+// Real-time updates listener
+function setupRealtimeListener() {
+    const todayStr = new Date().toISOString().split('T')[0];
+    
+    db.collection('expiry')
+        .where('expiryDate', '<=', todayStr)
+        .onSnapshot((snapshot) => {
+            if (!snapshot.empty) {
+                const products = [];
+                snapshot.forEach(doc => {
+                    products.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Sort by expiry date (most recently expired first)
+                products.sort((a, b) => {
+                    return new Date(b.expiryDate) - new Date(a.expiryDate);
+                });
+                
+                displayProducts(products);
+                productsContainer.style.display = 'grid';
+                emptyState.style.display = 'none';
+            } else {
+                showEmptyState();
+            }
+        }, (error) => {
+            console.error('Error in real-time listener:', error);
+        });
+}
+
+// Initialize real-time listener after initial load
+setTimeout(() => {
+    setupRealtimeListener();
+}, 2000);
+
+// Utility function to refresh the page data
+function refreshData() {
+    loadExpiredProducts();
+}
+
+// Add refresh functionality (optional)
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+        e.preventDefault();
+        refreshData();
+    }
 });

@@ -3,55 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expired Products - Inventory System</title>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    
-    <!-- CSS Stylesheet -->
-    <link rel="stylesheet" href="styles.css">
+    <title>Expired Products</title>
+    <link rel="stylesheet" href="expiry.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="warning-icon"></div>
-            <h1>Upcoming Expiry Dates</h1>
-        </div>
-
-        <div class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-number" id="totalExpired">0</div>
-                <div class="stat-label">Total Expired</div>
+        <header class="page-header">
+            <div class="header-content">
+                <i class="fas fa-exclamation-triangle warning-icon"></i>
+                <h1>Expired Products</h1>
+                 <a href="index.html" class="back-link">← Back to Dashboard</a>
             </div>
-            <div class="stat-item">
-                <div class="stat-number" id="expiredToday">0</div>
-                <div class="stat-label">Expired Today</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="totalValue">$0</div>
-                <div class="stat-label">Estimated Loss</div>
-            </div>
+        </header>
+
+        <div class="loading-spinner" id="loadingSpinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading expired products...</p>
         </div>
 
-        <div id="loadingContainer" class="loading">
-            <div class="spinner"></div>
-            Loading expired products...
+        <div class="error-message" id="errorMessage" style="display: none;">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Failed to load expired products. Please try again.</p>
+            <button onclick="loadExpiredProducts()" class="retry-btn">Retry</button>
         </div>
 
-        <div id="expiredContainer" class="expired-list" style="display: none;">
-            <!-- Expired products will be populated here -->
+        <div class="products-container" id="productsContainer">
+            <!-- Products will be dynamically loaded here -->
         </div>
 
-        <div id="emptyState" class="empty-state" style="display: none;">
-            <div class="empty-icon">✅</div>
-            <div class="empty-message">No Expired Products!</div>
-            <div class="empty-description">All your products are fresh and within their expiry dates.</div>
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-check-circle"></i>
+            <h2>No Expired Products</h2>
+            <p>Great! You don't have any expired products at the moment.</p>
         </div>
     </div>
+    <script type="module" src="expiry.js"></script>
 
-    <!-- JavaScript -->
-    <script src="script.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+    
+    
 </body>
 </html>
