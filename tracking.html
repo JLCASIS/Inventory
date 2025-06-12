@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="tracking.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <header class="page-header">
@@ -21,117 +23,70 @@
                 <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
             </div>
         </header>
+        <!-- Add this right after the <header> section -->
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search products..." autocomplete="off">
+                <button id="clearSearch" class="clear-btn" title="Clear search">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Categories Navigation -->
+        <nav class="categories-nav">
+            <div class="categories-container">
+                <button class="category-btn active" data-category="all">
+                    <i class="fas fa-th-large"></i> All Products
+                </button>
+                <button class="category-btn" data-category="grains">
+                    <i class="fas fa-seedling"></i> Grains
+                </button>
+                <button class="category-btn" data-category="dryfruits">
+                    <i class="fas fa-nuts"></i> Dry Fruits
+                </button>
+                <button class="category-btn" data-category="fruits">
+                    <i class="fas fa-apple-alt"></i> Fruits
+                </button>
+                <button class="category-btn" data-category="dairy">
+                    <i class="fas fa-cheese"></i> Dairy Products
+                </button>
+                <button class="category-btn" data-category="meats">
+                    <i class="fas fa-drumstick-bite"></i> Meats
+                </button>
+                <button class="category-btn" data-category="spices">
+                    <i class="fas fa-pepper-hot"></i> Spices
+                </button>
+                <button class="category-btn" data-category="sauces">
+                    <i class="fas fa-wine-bottle"></i> Sauces
+                </button>
+                <button class="category-btn" data-category="greens">
+                    <i class="fas fa-leaf"></i> Greens
+                </button>
+                <button class="category-btn" data-category="oils">
+                    <i class="fas fa-tint"></i> Oils
+                </button>
+                <button class="category-btn" data-category="eggs">
+                    <i class="fas fa-egg"></i> Eggs
+                </button>
+            </div>
+        </nav>
 
-        <div class="products-container">
-            <!-- Example product items -->
-            <div class="product-item">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=80&q=80" alt="Apple">
-                </div>
-                <div class="product-info">
-                    <div class="product-name">Apple</div>
-                    <div class="product-details">
-                        <div class="product-detail"><i class="fas fa-tag"></i> Category: Fruit</div>
-                        <div class="product-detail quantity-control">
-                            <i class="fas fa-box"></i> 
-                            Quantity: 
-                            <button class="decrease-btn" onclick="changeQuantity(this, -1)"><i class="fas fa-minus"></i></button>
-                            <span class="quantity-value">50</span>
-                            <button class="increase-btn" onclick="changeQuantity(this, 1)"><i class="fas fa-plus"></i></button>
-                        </div>
-                        <div class="product-detail status in-stock"><i class="fas fa-check-circle"></i> In Stock</div>
-                        <button class="delete-btn" onclick="deleteProduct(this)" title="Delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            </div>
-            <div class="product-item">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1587731596645-d945662ad7b5?auto=format&fit=crop&w=80&q=80" alt="Rice">
-                </div>
-                <div class="product-info">
-                    <div class="product-name">Rice</div>
-                    <div class="product-details">
-                        <div class="product-detail"><i class="fas fa-tag"></i> Category: Grain</div>
-                        <div class="product-detail quantity-control">
-                            <i class="fas fa-box"></i> 
-                            Quantity: 
-                            <button class="decrease-btn" onclick="changeQuantity(this, -1)"><i class="fas fa-minus"></i></button>
-                            <span class="quantity-value">200</span>
-                            <button class="increase-btn" onclick="changeQuantity(this, 1)"><i class="fas fa-plus"></i></button>
-                        </div>
-                        <div class="product-detail status in-stock"><i class="fas fa-check-circle"></i> In Stock</div>
-                        <button class="delete-btn" onclick="deleteProduct(this)" title="Delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            </div>
-            <div class="product-item">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80" alt="Milk">
-                </div>
-                <div class="product-info">
-                    <div class="product-name">Milk</div>
-                    <div class="product-details">
-                        <div class="product-detail"><i class="fas fa-tag"></i> Category: Dairy</div>
-                        <div class="product-detail quantity-control">
-                            <i class="fas fa-box"></i> 
-                            Quantity: 
-                            <button class="decrease-btn" onclick="changeQuantity(this, -1)"><i class="fas fa-minus"></i></button>
-                            <span class="quantity-value">10</span>
-                            <button class="increase-btn" onclick="changeQuantity(this, 1)"><i class="fas fa-plus"></i></button>
-                        </div>
-                        <div class="product-detail status low-stock"><i class="fas fa-exclamation-circle"></i> Low Stock</div>
-                        <button class="delete-btn" onclick="deleteProduct(this)" title="Delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            </div>
-            <div class="product-item">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=80&q=80" alt="Orange">
-                </div>
-                <div class="product-info">
-                    <div class="product-name">Orange</div>
-                    <div class="product-details">
-                        <div class="product-detail"><i class="fas fa-tag"></i> Category: Fruit</div>
-                        <div class="product-detail quantity-control">
-                            <i class="fas fa-box"></i> 
-                            Quantity: 
-                            <button class="decrease-btn" onclick="changeQuantity(this, -1)"><i class="fas fa-minus"></i></button>
-                            <span class="quantity-value">0</span>
-                            <button class="increase-btn" onclick="changeQuantity(this, 1)"><i class="fas fa-plus"></i></button>
-                        </div>
-                        <div class="product-detail status out-stock"><i class="fas fa-times-circle"></i> Out of Stock</div>
-                        <button class="delete-btn" onclick="deleteProduct(this)" title="Delete"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
+        <!-- Products Container -->
+        <div class="products-container" id="productsContainer">
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading products...
             </div>
         </div>
     </div>
-    <script>
-        function changeQuantity(btn, diff) {
-            const qtySpan = btn.parentElement.querySelector('.quantity-value');
-            let qty = parseInt(qtySpan.textContent, 10);
-            qty += diff;
-            if (qty < 0) qty = 0;
-            qtySpan.textContent = qty;
 
-            // Update status based on new quantity
-            const statusDiv = btn.parentElement.parentElement.querySelector('.status');
-            if (qty === 0) {
-                statusDiv.className = 'product-detail status out-stock';
-                statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> Out of Stock';
-            } else if (qty <= 10) {
-                statusDiv.className = 'product-detail status low-stock';
-                statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Low Stock';
-            } else {
-                statusDiv.className = 'product-detail status in-stock';
-                statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> In Stock';
-            }
-        }
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-firestore-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-auth-compat.min.js"></script>
 
-        function deleteProduct(btn) {
-            const productItem = btn.closest('.product-item');
-            productItem.remove();
-        }
-    </script>
+    <script type="module" src="JAVASCRIPT/tracking.js"></script>
 </body>
+
 </html>

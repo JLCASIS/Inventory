@@ -115,11 +115,26 @@
     </div>
     <div class="container">
         <div class="top-bar">
-            <input type="text" placeholder="Search" class="search-bar">
-            <div class="icons">
-                <span class="icon notification">🔔</span> <!-- Bell icon -->
+            <div class="notification-container">
+                <span class="icon notification" id="notificationIcon">🔔
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </span>
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-header">
+                        <h4>Notifications</h4>
+                        <span class="close-notifications" id="closeNotifications">&times;</span>
+                    </div>
+                    <div class="notification-list" id="notificationList">
+                        <!-- Notifications will be added here dynamically -->
+                    </div>
+                    <div class="notification-footer">
+                        <button id="clearNotifications">Mark all as read</button>
+                    </div>
+                </div>
             </div>
         </div>
+
+
 
         <button class="add-button">+ Add item to Inventory</button>
 
@@ -229,7 +244,7 @@
         }
     </script>
 
-    <script type="module" src="app.js"></script>
+    <script type="module" src="JAVASCRIPT/app.js"></script>
 </body>
 
 </html>
