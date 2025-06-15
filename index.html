@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Inventory Dashboard</title>
@@ -11,7 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 </head>
-
 <body>
     <!-- Popup Container -->
     <div class="popup-overlay" id="popupOverlay">
@@ -20,7 +18,6 @@
                 <h3>Add New Product</h3>
                 <span class="close-btn" id="closePopup">&times;</span>
             </div>
-
             <div class="form-steps">
                 <!-- Step 1: Select Category -->
                 <div class="form-step active" id="step1">
@@ -69,7 +66,6 @@
                     </div>
                     <button class="next-btn" id="step1Next">Next</button>
                 </div>
-
                 <!-- Step 2: Upload Image -->
                 <div class="form-step" id="step2">
                     <h4>Upload Product Image</h4>
@@ -85,7 +81,6 @@
                         <button class="next-btn" id="step2Next">Next</button>
                     </div>
                 </div>
-
                 <!-- Step 3: Product Details -->
                 <div class="form-step" id="step3">
                     <h4>Product Information</h4>
@@ -115,6 +110,10 @@
     </div>
     <div class="container">
         <div class="top-bar">
+            <!-- SEARCH BAR -->
+            <div class="search-bar-container">
+                <input type="text" id="searchBar" class="search-bar" placeholder="Search products, categories...">
+            </div>
             <div class="notification-container">
                 <span class="icon notification" id="notificationIcon">🔔
                     <span class="notification-badge" id="notificationBadge">0</span>
@@ -133,70 +132,65 @@
                 </div>
             </div>
         </div>
-
-
-
         <button class="add-button">+ Add item to Inventory</button>
-
         <h2>ADD PRODUCTS BY CATEGORY</h2>
-        <div class="categories">
-            <a href="grains.html" class="category-link">
+        <div class="categories" id="categoriesContainer">
+            <a href="grains.html" class="category-link" data-category="grains">
                 <div class="category" id="grains-category">
                     <img src="images/grains.webp" alt="Grains">
                     <p>Grains</p>
                 </div>
             </a>
-            <a href="dryfruits.html" class="category-link">
+            <a href="dryfruits.html" class="category-link" data-category="dryfruits">
                 <div class="category" id="dryfruits-category">
                     <img src="images/dry fruits.jpg" alt="Dry Fruits">
                     <p>Dry Fruits</p>
                 </div>
             </a>
-            <a href="fruits.html" class="category-link">
+            <a href="fruits.html" class="category-link" data-category="fruits">
                 <div class="category" id="fruits-category">
                     <img src="images/fruits.png" alt="Fruits">
                     <p>Fruits</p>
                 </div>
             </a>
-            <a href="dairyproducts.html" class="category-link">
+            <a href="dairyproducts.html" class="category-link" data-category="dairy">
                 <div class="category" id="dairy-category">
                     <img src="images/dairyproducts.jpeg" alt="Dairy Products">
                     <p>Dairy Products</p>
                 </div>
             </a>
-            <a href="meats.html" class="category-link">
+            <a href="meats.html" class="category-link" data-category="meats">
                 <div class="category" id="meats-category">
                     <img src="images/meats.png" alt="Meats">
                     <p>Meats</p>
                 </div>
             </a>
-
             <div class="extra-categories" style="display: none;">
-                <a href="spices.html" class="category-link">
+                <a href="spices.html" class="category-link" data-category="spices">
                     <div class="category" id="spices-category">
                         <img src="images/species.webp" alt="Spices">
                         <p>Spices</p>
                     </div>
                 </a>
-                <a href="sauces.html" class="category-link">
+                <a href="sauces.html" class="category-link" data-category="sauces">
                     <div class="category" id="sauces-category">
                         <img src="images/sauce.jpg" alt="Sauces">
                         <p>Sauces</p>
                     </div>
                 </a>
-                <a href="greens.html" class="category-link">
+                <a href="greens.html" class="category-link" data-category="greens">
                     <div class="category" id="greens-category">
                         <img src="images/greens.webp" alt="Greens">
                         <p>Greens</p>
                     </div>
                 </a>
-                <a href="oils.html" class="category-link">
+                <a href="oils.html" class="category-link" data-category="oils">
                     <div class="category" id="oils-category">
                         <img src="images/oils.jpg" alt="Oils">
                         <p>Oils</p>
                     </div>
                 </a>
-                <a href="eggs.html" class="category-link">
+                <a href="eggs.html" class="category-link" data-category="eggs">
                     <div class="category" id="eggs-category">
                         <img src="images/eggs.webp" alt="Eggs">
                         <p>Eggs</p>
@@ -204,12 +198,10 @@
                 </a>
             </div>
         </div>
-
         <div class="view-toggle" onclick="toggleCategories()">
             <span id="toggle-text">View all</span>
             <span class="arrow" id="toggle-arrow">→</span>
         </div>
-
         <div class="bottom-section">
             <a href="tracking.html" class="feature-link">
                 <div class="feature">
@@ -225,13 +217,11 @@
             </a>
         </div>
     </div>
-
     <script>
         function toggleCategories() {
             const extra = document.querySelector('.extra-categories');
             const text = document.getElementById('toggle-text');
             const arrow = document.getElementById('toggle-arrow');
-
             if (extra.style.display === 'none') {
                 extra.style.display = 'flex';
                 text.textContent = 'Less view';
@@ -242,9 +232,30 @@
                 arrow.textContent = '→';
             }
         }
-    </script>
 
+        // --- SEARCH BAR FUNCTIONALITY ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchBar = document.getElementById('searchBar');
+            const searchBtn = document.getElementById('searchBtn');
+            const categoriesContainer = document.getElementById('categoriesContainer');
+
+            function filterCategories() {
+                const query = searchBar.value.toLowerCase().trim();
+                const categoryLinks = categoriesContainer.querySelectorAll('.category-link, .extra-categories .category-link');
+                categoryLinks.forEach(link => {
+                    const text = link.textContent.toLowerCase();
+                    if (text.includes(query) || query === '') {
+                        link.style.display = '';
+                    } else {
+                        link.style.display = 'none';
+                    }
+                });
+            }
+
+            searchBar.addEventListener('input', filterCategories);
+            searchBtn.addEventListener('click', filterCategories);
+        });
+    </script>
     <script type="module" src="JAVASCRIPT/app.js"></script>
 </body>
-
 </html>
